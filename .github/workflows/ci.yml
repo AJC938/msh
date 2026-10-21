@@ -1,0 +1,85 @@
+name: CI
+
+# No remote is configured for this repository by instruction, so this
+# workflow has never executed. It is kept ready for the day one is added.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: build + test (${{ matrix.cc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          ${{ matrix.cc }} --version
+          make --version
+
+      - name: Build
+        run: make CC=${{ matrix.cc }} build
+
+      - name: Unit + integration tests
+        run: make CC=${{ matrix.cc }} test
+
+      - name: Ctrl+D at a real terminal
+        run: make CC=${{ matrix.cc }} test-pty
+
+  sanitizers:
+    name: ASan + UBSan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test with sanitizers
+        run: make asan
+        env:
+          ASAN_OPTIONS: detect_leaks=1:abort_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+
+  valgrind:
+    name: Valgrind memcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+      - name: Build (debug)
+        run: make debug
+      - name: Memcheck the REPL over piped input
+        # msh exits 127 for a not-yet-implemented command, so Valgrind's own
+        # verdict is carried on a distinct exit code (99) and checked, rather
+        # than masking failures with `|| true`.
+        run: |
+          set -eu
+          VG="valgrind --error-exitcode=99 --leak-check=full \
+              --show-leak-kinds=all --errors-for-leak-kinds=all \
+              --track-fds=yes --quiet"
+
+          run_case() {
+            desc=$1; want=$2
+            set +e
+            printf '%s' "$INPUT" | $VG ./out/msh >/dev/null
+            status=$?
+            set -e
+            if [ "$status" -eq 99 ]; then
+              echo "FAIL: $desc - valgrind reported errors or leaks"; exit 1
+            fi
+            if [ "$status" -ne "$want" ]; then
+              echo "FAIL: $desc - want exit $want, got $status"; exit 1
+            fi
+            echo "ok: $desc (exit $status, valgrind clean)"
+          }
+
+          INPUT='' run_case "immediate EOF" 0
+          INPUT='
+' run_case "blank line" 0
+          INPUT='somecommand
+' run_case "unimplemented command" 127

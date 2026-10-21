@@ -1,0 +1,11 @@
+# This is a Linux/POSIX project that may be edited from Windows, where
+# core.autocrlf=true would otherwise rewrite checkouts to CRLF. That breaks
+# real things on the target platform: /bin/sh rejects a script whose lines end
+# in \r, and Make mis-reads recipe lines. Pin everything to LF in the
+# repository and in the working tree.
+* text=auto eol=lf
+
+# Binary-ish artefacts that must never be touched.
+*.png binary
+*.gz  binary
+*.zip binary

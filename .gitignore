@@ -1,0 +1,23 @@
+# Build output
+out/
+build/
+*.o
+*.d
+
+# Executables
+msh
+msh.exe
+*.exe
+
+# Debug / sanitizer artefacts
+*.dSYM/
+core
+vgcore.*
+valgrind-out.txt
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
