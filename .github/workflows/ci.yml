@@ -1,12 +1,15 @@
 name: CI
 
-# No remote is configured for this repository by instruction, so this
-# workflow has never executed. It is kept ready for the day one is added.
-
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+# No job here may mask a failure. There is deliberately no `continue-on-error`
+# and no `|| true`: a red status is the point of running this at all.
+permissions:
+  contents: read
 
 jobs:
   build-and-test:
@@ -22,15 +25,17 @@ jobs:
       - name: Show toolchain
         run: |
           ${{ matrix.cc }} --version
-          make --version
+          make --version | head -1
 
-      - name: Build
-        run: make CC=${{ matrix.cc }} build
+      - name: Build with the full warning set
+        # The warning set is in the Makefile; -Werror here turns any warning
+        # that CI's compiler version reports into a failure.
+        run: make CC=${{ matrix.cc }} EXTRA_CFLAGS=-Werror build
 
       - name: Unit + integration tests
         run: make CC=${{ matrix.cc }} test
 
-      - name: Ctrl+D at a real terminal
+      - name: Terminal tests through a real pty
         run: make CC=${{ matrix.cc }} test-pty
 
   sanitizers:
@@ -38,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build and test with sanitizers
+      - name: Build and run the suite under ASan/UBSan
         run: make asan
         env:
           ASAN_OPTIONS: detect_leaks=1:abort_on_error=1
@@ -51,35 +56,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Valgrind
         run: sudo apt-get update && sudo apt-get install -y valgrind
-      - name: Build (debug)
-        run: make debug
-      - name: Memcheck the REPL over piped input
-        # msh exits 127 for a not-yet-implemented command, so Valgrind's own
-        # verdict is carried on a distinct exit code (99) and checked, rather
-        # than masking failures with `|| true`.
-        run: |
-          set -eu
-          VG="valgrind --error-exitcode=99 --leak-check=full \
-              --show-leak-kinds=all --errors-for-leak-kinds=all \
-              --track-fds=yes --quiet"
-
-          run_case() {
-            desc=$1; want=$2
-            set +e
-            printf '%s' "$INPUT" | $VG ./out/msh >/dev/null
-            status=$?
-            set -e
-            if [ "$status" -eq 99 ]; then
-              echo "FAIL: $desc - valgrind reported errors or leaks"; exit 1
-            fi
-            if [ "$status" -ne "$want" ]; then
-              echo "FAIL: $desc - want exit $want, got $status"; exit 1
-            fi
-            echo "ok: $desc (exit $status, valgrind clean)"
-          }
-
-          INPUT='' run_case "immediate EOF" 0
-          INPUT='
-' run_case "blank line" 0
-          INPUT='somecommand
-' run_case "unimplemented command" 127
+      - name: Memcheck the execution paths
+        # tests/integration/test_valgrind.sh carries Valgrind's own verdict on
+        # a distinct exit code (99) so it cannot be confused with msh's exit
+        # status. There is no suppression file, by design.
+        run: make valgrind
