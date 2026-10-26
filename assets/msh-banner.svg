@@ -66,7 +66,7 @@
       <text x="26" y="162" fill="#3ddc84">msh$</text>
       <text x="86" y="162" fill="#e6edf3">jobs</text>
 
-      <text x="26" y="200" fill="#38bdf8">[1]+ Running</text>
+      <text x="26" y="200" fill="#38bdf8">[1] Running</text>
       <text x="196" y="200" fill="#8b98a5">cat log.txt | grep err &amp;</text>
 
       <text x="26" y="224" fill="#3ddc84">msh$</text>

@@ -1,18 +1,27 @@
 <p align="center">
-  <img src="assets/msh-banner.svg" alt="msh — a minimal Unix-style shell in C" width="100%">
+  <img src="assets/msh-banner.svg" width="100%"
+       alt="MSH — A Minimal Unix-Style Shell in C. A terminal window running a piped background command, beside pipe segments labelled fork, execvp, pipe and dup2, and a C11 / POSIX.1-2008 mark.">
 </p>
 
-# msh
+# <img src="assets/msh-logo.svg" alt="" width="28" height="28"> MSH — A Minimal Unix-Style Shell in C
 
 [![CI](https://github.com/AJC938/msh/actions/workflows/ci.yml/badge.svg)](https://github.com/AJC938/msh/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 [![C11](https://img.shields.io/badge/C-11-00599C.svg)](https://en.cppreference.com/w/c/11)
 [![POSIX.1-2008](https://img.shields.io/badge/POSIX.1--2008-informational.svg)](https://pubs.opengroup.org/onlinepubs/9699919799/)
 
+|  |  |
+| --- | --- |
+| **Project** | MSH — a minimal Unix-style shell |
+| **Language** | C11 (`-std=c11`), no third-party libraries |
+| **Domain** | Linux / POSIX systems programming |
+| **Purpose** | an educational user-space shell implementation |
+
 A minimal Unix-style interactive shell written in **C11** against
-**POSIX.1-2008** interfaces, with no third-party libraries. Parsing,
-redirection, pipelines, signals and job control are implemented directly on
-`fork`, `execvp`, `pipe`, `dup2`, `waitpid`, `setpgid` and `tcsetpgrp`.
+**POSIX.1-2008** interfaces. Parsing, redirection, pipelines, signals and job
+control are implemented directly on `fork`, `execvp`, `pipe`, `dup2`,
+`waitpid`, `setpgid` and `tcsetpgrp` — nothing is delegated to `system()`,
+`popen()`, or another shell.
 
 > **This is an educational minimal shell, not a Bash replacement.** It does not
 > implement the POSIX shell command language. It implements a small,
