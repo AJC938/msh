@@ -1,4 +1,4 @@
-# msh architecture
+# MSH — Minimal Shell: architecture
 
 This document describes what is actually implemented. It is updated as each
 milestone lands, not ahead of it.

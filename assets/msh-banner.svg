@@ -1,119 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 665" width="2000" height="665"
      role="img" aria-labelledby="title desc">
-  <title id="title">MSH — A Minimal Unix-Style Shell in C</title>
-  <desc id="desc">A terminal window on a dark charcoal background. Inside it, a shell
-    prompt runs a piped command. To the right, three pipe segments carry data between
-    stages, and a C language mark sits beneath them.</desc>
+  <title id="title">MSH — Minimal Shell</title>
+  <desc id="desc">The msh wordmark on a black background, with the subtitle "A Minimal
+    Unix-Style Shell in C" and the tags systems programming, Linux and POSIX. Beside it a
+    terminal window shows an msh session running ls -la and echo "Hello, MSH!".</desc>
 
   <defs>
-    <!-- Monospace is requested by generic family only: no font is fetched. -->
+    <!-- Generic families only: nothing is fetched over the network. -->
     <style>
-      .mono { font-family: "DejaVu Sans Mono", "Liberation Mono", Consolas, monospace; }
-      .sans { font-family: "DejaVu Sans", Verdana, Geneva, sans-serif; }
+      .mono { font-family: "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace; }
+      .sans { font-family: Helvetica, Arial, "DejaVu Sans", sans-serif; }
     </style>
-
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1b1f24"/>
-      <stop offset="1" stop-color="#11141a"/>
-    </linearGradient>
-
-    <linearGradient id="pipeFill" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#3ddc84"/>
-      <stop offset="1" stop-color="#38bdf8"/>
-    </linearGradient>
-
-    <!-- One pipe segment: a cylinder with collars at both ends. -->
-    <g id="pipe">
-      <rect x="0" y="-13" width="86" height="26" rx="5" fill="#1d2b2a"
-            stroke="url(#pipeFill)" stroke-width="2.5"/>
-      <rect x="-6" y="-18" width="14" height="36" rx="3" fill="#24403b"
-            stroke="url(#pipeFill)" stroke-width="2.5"/>
-      <rect x="78" y="-18" width="14" height="36" rx="3" fill="#24403b"
-            stroke="url(#pipeFill)" stroke-width="2.5"/>
-      <line x1="10" y1="-5" x2="70" y2="-5" stroke="#3ddc84" stroke-width="2"
-            stroke-linecap="round" opacity="0.45"/>
-    </g>
+    <radialGradient id="glow" cx="38%" cy="42%" r="72%">
+      <stop offset="0" stop-color="#1a1a1a"/>
+      <stop offset="1" stop-color="#070707"/>
+    </radialGradient>
   </defs>
 
-  <rect width="1200" height="400" fill="url(#bg)"/>
+  <rect width="2000" height="665" fill="#0a0a0a"/>
+  <rect width="2000" height="665" fill="url(#glow)"/>
 
-  <!-- A faint grid, to read as a screen rather than flat paper. -->
-  <g stroke="#ffffff" stroke-width="1" opacity="0.035">
-    <path d="M0 50h1200M0 100h1200M0 150h1200M0 200h1200M0 250h1200M0 300h1200M0 350h1200"/>
-    <path d="M50 0v400M150 0v400M250 0v400M350 0v400M450 0v400M550 0v400M650 0v400M750 0v400M850 0v400M950 0v400M1050 0v400M1150 0v400"/>
-  </g>
+  <!-- ============================ wordmark ============================ -->
+  <g transform="translate(210 0)">
+    <text class="sans" x="0" y="340" font-size="230" font-weight="bold"
+          letter-spacing="-6" textLength="470" lengthAdjust="spacing">
+      <tspan fill="#f2f2f2">m</tspan><tspan fill="#2ecc71">s</tspan><tspan fill="#f2f2f2">h</tspan>
+    </text>
+    <!-- the cursor underscore, a block rather than a typeface glyph -->
+    <rect x="500" y="312" width="92" height="26" fill="#2ecc71"/>
 
-  <!-- ===================== terminal window ===================== -->
-  <g transform="translate(64 96)">
-    <rect x="0" y="0" width="560" height="236" rx="12" fill="#0d1117"
-          stroke="#2f3a46" stroke-width="2"/>
-    <!-- title bar -->
-    <path d="M0 12A12 12 0 0 1 12 0h536a12 12 0 0 1 12 12v28H0z" fill="#1c232c"/>
-    <line x1="0" y1="40" x2="560" y2="40" stroke="#2f3a46" stroke-width="2"/>
-    <circle cx="26" cy="20" r="6" fill="#ff5f57"/>
-    <circle cx="48" cy="20" r="6" fill="#febc2e"/>
-    <circle cx="70" cy="20" r="6" fill="#3ddc84"/>
-    <text class="mono" x="280" y="25" fill="#8b98a5" font-size="15"
-          text-anchor="middle">msh</text>
-
-    <!-- session -->
-    <g class="mono" font-size="19">
-      <text x="26" y="86" fill="#3ddc84">msh$</text>
-      <text x="86" y="86" fill="#e6edf3">cat log.txt | grep err &gt; out.txt &amp;</text>
-
-      <text x="26" y="124" fill="#8b98a5">[1] 4812</text>
-
-      <text x="26" y="162" fill="#3ddc84">msh$</text>
-      <text x="86" y="162" fill="#e6edf3">jobs</text>
-
-      <text x="26" y="200" fill="#38bdf8">[1] Running</text>
-      <text x="196" y="200" fill="#8b98a5">cat log.txt | grep err &amp;</text>
-
-      <text x="26" y="224" fill="#3ddc84">msh$</text>
-      <rect x="86" y="208" width="12" height="20" fill="#3ddc84" opacity="0.9"/>
-    </g>
-  </g>
-
-  <!-- ===================== pipes ===================== -->
-  <g transform="translate(700 140)">
-    <use href="#pipe" x="0" y="0"/>
-    <use href="#pipe" x="110" y="0"/>
-    <use href="#pipe" x="220" y="0"/>
-
-    <!-- data moving left to right between the segments -->
-    <g fill="#38bdf8">
-      <circle cx="98" cy="0" r="4"/>
-      <circle cx="208" cy="0" r="4"/>
-      <circle cx="318" cy="0" r="4"/>
-    </g>
-
-    <text class="mono" x="156" y="-42" fill="#8b98a5" font-size="20"
-          text-anchor="middle">stdout &#8594; stdin</text>
-    <text class="mono" x="156" y="54" fill="#3ddc84" font-size="26"
-          text-anchor="middle">fork &#183; execvp &#183; pipe &#183; dup2</text>
-  </g>
-
-  <!-- ===================== C mark ===================== -->
-  <g transform="translate(856 252)">
-    <rect x="0" y="0" width="88" height="88" rx="16" fill="#0d1117"
-          stroke="#38bdf8" stroke-width="2.5"/>
-    <text class="sans" x="44" y="62" fill="#38bdf8" font-size="52"
-          font-weight="bold" text-anchor="middle">C</text>
-    <text class="mono" x="100" y="40" fill="#8b98a5" font-size="18">C11</text>
-    <text class="mono" x="100" y="66" fill="#8b98a5" font-size="18">POSIX.1-2008</text>
-  </g>
-
-  <!-- ===================== title ===================== -->
-  <g transform="translate(64 0)">
-    <text class="mono" x="0" y="56" fill="#3ddc84" font-size="54"
-          font-weight="bold" letter-spacing="6">MSH</text>
-    <text class="sans" x="152" y="56" fill="#c9d4e0" font-size="24">
+    <text class="mono" x="0" y="404" font-size="40" fill="#ededed">
       A Minimal Unix-Style Shell in C
+    </text>
+
+    <text class="mono" x="2" y="502" font-size="32" fill="#8a8a8a" letter-spacing="1">
+      SYSTEMS PROGRAMMING<tspan fill="#2ecc71">&#160;&#160;|&#160;&#160;</tspan>LINUX<tspan fill="#2ecc71">&#160;&#160;|&#160;&#160;</tspan>POSIX
     </text>
   </g>
 
-  <line x1="64" y1="368" x2="1136" y2="368" stroke="#2f3a46" stroke-width="2"/>
-  <text class="mono" x="64" y="392" fill="#8b98a5" font-size="17">
-    parsing &#183; redirection &#183; pipelines &#183; signals &#183; job control
-  </text>
+  <!-- ============================ terminal ============================ -->
+  <g>
+    <rect x="1050" y="100" width="820" height="460" rx="18" fill="#141414"
+          stroke="#2a2a2a" stroke-width="2"/>
+
+    <!-- title bar -->
+    <path d="M1050 118a18 18 0 0 1 18-18h784a18 18 0 0 1 18 18v42h-820z" fill="#1c1c1c"/>
+    <line x1="1050" y1="160" x2="1870" y2="160" stroke="#2a2a2a" stroke-width="2"/>
+    <circle cx="1088" cy="130" r="11" fill="#ff5f57"/>
+    <circle cx="1124" cy="130" r="11" fill="#febc2e"/>
+    <circle cx="1160" cy="130" r="11" fill="#28c840"/>
+    <text class="mono" x="1460" y="139" font-size="26" fill="#8a8a8a"
+          text-anchor="middle">msh</text>
+
+    <!-- session; non-breaking spaces keep the ls columns aligned -->
+    <g class="mono" font-size="23">
+      <text x="1083" y="205" fill="#2ecc71">msh$</text>
+      <text x="1155" y="205" fill="#ededed">ls -la</text>
+
+      <text x="1083" y="238" fill="#d0d0d0">total 24</text>
+      <text x="1083" y="271" fill="#d0d0d0">drwxr-xr-x&#160;&#160;3&#160;user&#160;user&#160;4096&#160;Oct&#160;26&#160;12:00&#160;.</text>
+      <text x="1083" y="304" fill="#d0d0d0">drwxr-xr-x&#160;10&#160;user&#160;user&#160;4096&#160;Oct&#160;26&#160;11:45&#160;..</text>
+      <text x="1083" y="337" fill="#d0d0d0">-rw-r--r--&#160;&#160;1&#160;user&#160;user&#160;&#160;220&#160;Oct&#160;26&#160;12:00&#160;README.md</text>
+      <text x="1083" y="370" fill="#d0d0d0">drwxr-xr-x&#160;&#160;6&#160;user&#160;user&#160;4096&#160;Oct&#160;26&#160;12:00&#160;src</text>
+
+      <text x="1083" y="432" fill="#2ecc71">msh$</text>
+      <text x="1155" y="432" fill="#ededed">echo "Hello, MSH!"</text>
+      <text x="1083" y="465" fill="#d0d0d0">Hello, MSH!</text>
+
+      <text x="1083" y="503" fill="#2ecc71">msh$</text>
+      <rect x="1155" y="483" width="14" height="25" fill="#2ecc71"/>
+    </g>
+  </g>
 </svg>

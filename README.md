@@ -1,9 +1,9 @@
 <p align="center">
   <img src="assets/msh-banner.svg" width="100%"
-       alt="MSH — A Minimal Unix-Style Shell in C. A terminal window running a piped background command, beside pipe segments labelled fork, execvp, pipe and dup2, and a C11 / POSIX.1-2008 mark.">
+       alt="MSH — Minimal Shell. The msh wordmark with the subtitle &quot;A Minimal Unix-Style Shell in C&quot; and the tags systems programming, Linux and POSIX, beside a terminal window showing an msh session running ls -la and echo.">
 </p>
 
-# <img src="assets/msh-logo.svg" alt="" width="28" height="28"> MSH — A Minimal Unix-Style Shell in C
+# <img src="assets/msh-logo.svg" alt="" width="28" height="28"> MSH — Minimal Shell
 
 [![CI](https://github.com/AJC938/msh/actions/workflows/ci.yml/badge.svg)](https://github.com/AJC938/msh/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
@@ -12,7 +12,7 @@
 
 |  |  |
 | --- | --- |
-| **Project** | MSH — a minimal Unix-style shell |
+| **Project** | MSH — Minimal Shell |
 | **Language** | C11 (`-std=c11`), no third-party libraries |
 | **Domain** | Linux / POSIX systems programming |
 | **Purpose** | an educational user-space shell implementation |

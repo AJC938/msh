@@ -1,4 +1,4 @@
-# msh — Requirements
+# MSH — Minimal Shell: requirements
 
 What msh is required to do, and the boundary of what it is not. Each
 requirement is numbered so a test or a review can cite it. Requirements marked
