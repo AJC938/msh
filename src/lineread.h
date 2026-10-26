@@ -15,7 +15,8 @@
 typedef enum {
     MSH_READ_OK,    /* a line was read; *out owns a NUL-terminated buffer */
     MSH_READ_EOF,   /* end of input with no pending data; *out is NULL     */
-    MSH_READ_ERROR  /* stream error or allocation failure; *out is NULL    */
+    MSH_READ_ERROR, /* stream error or allocation failure; *out is NULL    */
+    MSH_READ_INTERRUPTED /* a signal arrived before any input; *out NULL   */
 } msh_read_status;
 
 /*
@@ -29,8 +30,15 @@ typedef enum {
  * following call then reports MSH_READ_EOF. This is what makes Ctrl+D after
  * partial input behave the way a shell user expects.
  *
- * On MSH_READ_EOF and MSH_READ_ERROR, *out is set to NULL and there is
- * nothing for the caller to free.
+ * MSH_READ_INTERRUPTED is returned when a signal interrupts the read
+ * before any character of a line has arrived. Nothing has been consumed,
+ * so the caller may do whatever the signal called for -- reaping finished
+ * jobs, say -- and then read again. A signal that arrives mid-line is
+ * retried internally instead, because the characters already typed would
+ * otherwise be lost.
+ *
+ * On MSH_READ_EOF, MSH_READ_ERROR and MSH_READ_INTERRUPTED, *out is set to
+ * NULL and there is nothing for the caller to free.
  *
  * Embedded NUL bytes are preserved in the buffer but, as with any C string,
  * truncate the value as seen by string functions. `out_len`, when non-NULL,

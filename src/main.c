@@ -5,6 +5,7 @@
 int main(int argc, char **argv)
 {
     msh_shell sh;
+    int status;
 
     /*
      * Milestone 1 takes no options and does not read scripts. Reject extra
@@ -18,5 +19,7 @@ int main(int argc, char **argv)
     }
 
     msh_shell_init(&sh);
-    return msh_shell_run(&sh);
+    status = msh_shell_run(&sh);
+    msh_shell_shutdown(&sh);
+    return status;
 }

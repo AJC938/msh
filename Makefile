@@ -7,6 +7,7 @@
 #   make asan          AddressSanitizer + UndefinedBehaviorSanitizer build
 #   make test          build and run unit + integration tests
 #   make test-pty      Ctrl+D-at-a-terminal test (Linux only, needs -lutil)
+#   make valgrind      memcheck over the execution paths (needs valgrind)
 #   make clean         remove build artefacts
 
 # `CC ?= gcc` would not take effect: Make predefines CC as "cc", which counts
@@ -31,15 +32,15 @@ CFLAGS   := $(CSTD) $(WARNINGS) $(OPTFLAGS) $(EXTRA_CFLAGS)
 BUILD_DIR := out
 BIN       := $(BUILD_DIR)/msh
 
-SRCS := src/main.c src/shell.c src/lineread.c
+SRCS := src/main.c src/shell.c src/lineread.c src/parser.c src/executor.c src/builtins.c src/redirect.c src/jobs.c src/signals.c
 OBJS := $(SRCS:src/%.c=$(BUILD_DIR)/%.o)
 
 # Sources under test, excluding main.c (the test binaries supply their own).
-LIB_SRCS  := src/shell.c src/lineread.c
+LIB_SRCS  := src/shell.c src/lineread.c src/parser.c src/executor.c src/builtins.c src/redirect.c src/jobs.c src/signals.c
 UNIT_SRCS := $(wildcard tests/unit/test_*.c)
 UNIT_BINS := $(UNIT_SRCS:tests/unit/test_%.c=$(BUILD_DIR)/test_%)
 
-.PHONY: all build debug asan test test-unit test-integration test-pty clean
+.PHONY: all build debug asan test test-unit test-integration test-pty valgrind clean
 
 all: build
 build: $(BIN)
@@ -77,6 +78,12 @@ test-unit: $(UNIT_BINS)
 
 test-integration: $(BIN)
 	@MSH_BIN=$(BIN) sh tests/integration/test_repl.sh
+	@MSH_BIN=$(BIN) sh tests/integration/test_exec.sh
+	@MSH_BIN=$(BIN) sh tests/integration/test_builtins.sh
+	@MSH_BIN=$(BIN) sh tests/integration/test_quoting.sh
+	@MSH_BIN=$(BIN) sh tests/integration/test_redirect.sh
+	@MSH_BIN=$(BIN) sh tests/integration/test_pipeline.sh
+	@MSH_BIN=$(BIN) sh tests/integration/test_jobs.sh
 
 test: test-unit test-integration
 	@echo "all tests passed"
@@ -86,6 +93,14 @@ test-pty: $(BIN) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/test_pty \
 	      tests/integration/test_pty.c -lutil
 	./$(BUILD_DIR)/test_pty ./$(BIN)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/test_pty_jobs \
+	      tests/integration/test_pty_jobs.c -lutil
+	./$(BUILD_DIR)/test_pty_jobs ./$(BIN)
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+# Memcheck over the execution paths. Separate from `test` because Valgrind is
+# not installed everywhere and is slow; it skips cleanly if absent.
+valgrind: debug
+	@MSH_BIN=$(BIN) sh tests/integration/test_valgrind.sh

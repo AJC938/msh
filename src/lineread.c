@@ -1,5 +1,6 @@
 #include "lineread.h"
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -54,7 +55,25 @@ msh_read_status msh_read_line(FILE *stream, char **out, size_t *out_len)
     if (buf == NULL)
         return MSH_READ_ERROR;
 
-    while ((c = fgetc(stream)) != EOF) {
+    for (;;) {
+        errno = 0;
+        c = fgetc(stream);
+        if (c == EOF) {
+            /*
+             * A signal interrupted the read. With nothing typed yet the
+             * caller can act on it and come back; mid-line it must be
+             * retried here, or the characters already entered are lost.
+             */
+            if (ferror(stream) && errno == EINTR) {
+                clearerr(stream);
+                if (len == 0) {
+                    free(buf);
+                    return MSH_READ_INTERRUPTED;
+                }
+                continue;
+            }
+            break;
+        }
         if (c == '\n')
             break;
         /* +1 keeps room for the terminating NUL written after the loop. */

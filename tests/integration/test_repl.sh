@@ -4,6 +4,9 @@
 # IMPORTANT: piped stdin is NOT a terminal, so these tests cover the
 # non-interactive path only. Ctrl+D at a real terminal is covered separately
 # by tests/integration/test_pty.c (`make test-pty`, Linux only).
+#
+# External command execution has its own suite in test_exec.sh; this file
+# stays focused on input handling, blank lines, EOF and argument rejection.
 
 set -u
 
@@ -59,7 +62,8 @@ printf '' | "$MSH_BIN" >"$tmpout" 2>"$tmperr"
 check_status "eof on empty input exits 0" 0 $?
 check_empty  "eof on empty input prints nothing" "$tmpout"
 
-# Blank and whitespace-only lines are no-ops and must not change the status.
+# Blank and whitespace-only lines are no-ops and must not change the status,
+# and must not fork a child.
 printf '\n\n   \n\t\n\n' | "$MSH_BIN" >"$tmpout" 2>"$tmperr"
 check_status "blank lines only exit 0" 0 $?
 check_empty  "blank lines produce no stdout" "$tmpout"
@@ -70,19 +74,31 @@ printf '\n' | "$MSH_BIN" >"$tmpout" 2>/dev/null
 check_empty "no prompt when stdin is not a tty" "$tmpout"
 
 # A final line without a trailing newline is still a line (piped analogue of
-# typing text then pressing Ctrl+D), so it reaches dispatch: status 127.
+# typing text then pressing Ctrl+D), so it reaches dispatch. The command does
+# not exist, so exec fails with the conventional 127.
 printf 'somecommand' | "$MSH_BIN" >"$tmpout" 2>"$tmperr"
 check_status "unterminated final line is dispatched" 127 $?
-check_contains "not-implemented message on stderr" "$tmperr" "not implemented"
+check_contains "failed command named on stderr" "$tmperr" "somecommand"
 
 # Status of the last line is the shell's exit status.
 printf 'somecommand\n\n' | "$MSH_BIN" >"$tmpout" 2>"$tmperr"
 check_status "blank line after command keeps status" 127 $?
 
-# A line far longer than the initial buffer must not overflow or crash.
+# A line far longer than the initial buffer must not overflow or crash. The
+# command name is absurd, so exec necessarily fails; whether that surfaces as
+# 127 (not found) or 126 (name too long) depends on libc PATH-search details,
+# so both are accepted. What this pins is that msh survives the line and
+# reports a failure rather than crashing.
 awk 'BEGIN { for (i = 0; i < 200000; i++) printf "a" ; printf "\n" }' \
     | "$MSH_BIN" >"$tmpout" 2>"$tmperr"
-check_status "200000-char line handled without crash" 127 $?
+st=$?
+tests=$((tests + 1))
+if [ "$st" = "127" ] || [ "$st" = "126" ]; then
+    printf '  %-48s ok\n' "200000-char line survives, reports failure"
+else
+    printf '  %-48s FAILED (got %s)\n' "200000-char line survives, reports failure" "$st"
+    failures=$((failures + 1))
+fi
 
 # Unsupported arguments are rejected rather than ignored.
 "$MSH_BIN" --nope </dev/null >"$tmpout" 2>"$tmperr"
